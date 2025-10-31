@@ -22,6 +22,20 @@ export function Navbar() {
     setIsMobileMenuOpen(false)
   }
 
+  // Variants para animación suave del menú móvil
+  const panelVariants = {
+    closed: { opacity: 0, height: 0, transition: { duration: 0.35, ease: 'easeInOut' as const } },
+    open:   { opacity: 1, height: "auto", transition: { duration: 0.45, ease: 'easeInOut' as const } }
+  }
+  const listVariants = {
+    closed: { transition: { staggerChildren: 0.05, staggerDirection: -1 } },
+    open:   { transition: { staggerChildren: 0.06, delayChildren: 0.05 } }
+  }
+  const itemVariants = {
+    closed: { opacity: 0, y: 8, transition: { duration: 0.25 } },
+    open:   { opacity: 1, y: 0, transition: { duration: 0.35 } }
+  }
+
   return (
     <nav
       className={`fixed z-50 left-1/2 -translate-x-1/2 transition-all duration-700 ease-in-out
@@ -70,42 +84,52 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      <AnimatePresence>
+      {/* Mobile Menu - mismo fondo (transparente+blur), sin fondo distinto ni bordes extra */}
+      <AnimatePresence initial={false}>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-transparent backdrop-blur-2xl border-t border-primary/10 rounded-2xl shadow-lg mx-2 mt-2"
-            style={{ WebkitBackdropFilter: 'blur(32px)', transition: 'all 0.6s cubic-bezier(0.4,0,0.2,1), opacity 0.7s cubic-bezier(0.4,0,0.2,1)' }}
+            key="mobile-panel"
+            variants={panelVariants}
+            initial="closed"
+            animate="open"
+            exit="closed"
+            className="md:hidden bg-transparent backdrop-blur-2xl mx-2 mt-2 overflow-hidden"
+            style={{ WebkitBackdropFilter: 'blur(32px)' }}
           >
-            <div className="container mx-auto px-4 py-6 space-y-4">
-              <a
+            <motion.div
+              className="container mx-auto px-4 py-6 space-y-4"
+              variants={listVariants}
+              initial="closed"
+              animate="open"
+              exit="closed"
+            >
+              <motion.a variants={itemVariants}
                 href="#beneficios"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="block text-foreground hover:text-primary transition-colors py-2"
               >
                 Beneficios
-              </a>
-              <a
+              </motion.a>
+              <motion.a variants={itemVariants}
                 href="#proceso"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="block text-foreground hover:text-primary transition-colors py-2"
               >
                 Proceso
-              </a>
-              <a
+              </motion.a>
+              <motion.a variants={itemVariants}
                 href="#testimonios"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="block text-foreground hover:text-primary transition-colors py-2"
               >
                 Testimonios
-              </a>
-              <Button onClick={scrollToForm} className="w-full bg-primary hover:bg-primary/90">
-                Empezar ahora
-              </Button>
-            </div>
+              </motion.a>
+              <motion.div variants={itemVariants}>
+                <Button onClick={scrollToForm} className="w-full bg-primary hover:bg-primary/90">
+                  Empezar ahora
+                </Button>
+              </motion.div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
