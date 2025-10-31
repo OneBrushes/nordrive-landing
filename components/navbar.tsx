@@ -36,103 +36,122 @@ export function Navbar() {
     open:   { opacity: 1, y: 0, transition: { duration: 0.35 } }
   }
 
+  const showGlass = isScrolled || isMobileMenuOpen
+
   return (
-    <nav
-      className={`fixed z-50 left-1/2 -translate-x-1/2 transition-all duration-700 ease-in-out
-        ${isScrolled
-          ? "top-3 md:top-4 w-[calc(100vw-24px)] md:w-full md:max-w-[1200px] rounded-2xl shadow-lg border border-primary/12 backdrop-blur-2xl"
-          : "top-0 w-full max-w-full rounded-none shadow-none border-transparent backdrop-blur-0"
-        }`}
-      style={{
-        WebkitBackdropFilter: isScrolled ? 'blur(32px)' : undefined,
-        transition: 'all 0.7s cubic-bezier(0.4,0,0.2,1), opacity 0.7s cubic-bezier(0.4,0,0.2,1)',
-        opacity: isScrolled ? 1 : 0.97
-      }}
-    >
-      <div className="container mx-auto px-4 md:px-6">
-        <div
-          className={`flex items-center justify-between transition-all duration-700 ease-in-out ${isScrolled ? "h-16" : "h-20"}`}
-        >
-          <div className="flex items-center gap-3">
-            <img
-              src="/Logo.png"
-              alt="nordrive Logo"
-              className={`w-auto object-contain transition-all duration-700 ease-in-out ${isScrolled ? "h-8" : "h-12"}`}
-            />
-          </div>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            <a href="#beneficios" className="text-foreground hover:text-primary transition-colors">
-              Beneficios
-            </a>
-            <a href="#proceso" className="text-foreground hover:text-primary transition-colors">
-              Proceso
-            </a>
-            <a href="#testimonios" className="text-foreground hover:text-primary transition-colors">
-              Testimonios
-            </a>
-            <Button onClick={scrollToForm} className="bg-primary hover:bg-primary/90">
-              Empezar ahora
-            </Button>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden text-foreground">
-            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu - mismo fondo (transparente+blur), sin fondo distinto ni bordes extra */}
-      <AnimatePresence initial={false}>
+    <>
+      {/* Overlay móvil al abrir menú */}
+      <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            key="mobile-panel"
-            variants={panelVariants}
-            initial="closed"
-            animate="open"
-            exit="closed"
-            className="md:hidden bg-transparent backdrop-blur-2xl mx-2 mt-2 overflow-hidden"
-            style={{ WebkitBackdropFilter: 'blur(32px)' }}
+            key="overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            className="fixed inset-0 z-40 md:hidden bg-background/40 backdrop-blur-sm"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      <nav
+        className={`fixed z-50 left-1/2 -translate-x-1/2 transition-all duration-700 ease-in-out
+          ${showGlass
+            ? "top-3 md:top-4 w-[calc(100vw-24px)] md:w-full md:max-w-[1200px] rounded-2xl shadow-lg border border-primary/12 backdrop-blur-2xl"
+            : "top-0 w-full max-w-full rounded-none shadow-none border-transparent backdrop-blur-0"
+          }`}
+        style={{
+          WebkitBackdropFilter: showGlass ? 'blur(32px)' : undefined,
+          transition: 'all 0.7s cubic-bezier(0.4,0,0.2,1), opacity 0.7s cubic-bezier(0.4,0,0.2,1)',
+          opacity: showGlass ? 1 : 0.97
+        }}
+      >
+        <div className="container mx-auto px-4 md:px-6">
+          <div
+            className={`flex items-center justify-between transition-all duration-700 ease-in-out ${showGlass ? "h-16" : "h-20"}`}
           >
+            <div className="flex items-center gap-3">
+              <img
+                src="/Logo.png"
+                alt="nordrive Logo"
+                className={`w-auto object-contain transition-all duration-700 ease-in-out ${showGlass ? "h-8" : "h-12"}`}
+              />
+            </div>
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center gap-8">
+              <a href="#beneficios" className="text-foreground hover:text-primary transition-colors">
+                Beneficios
+              </a>
+              <a href="#proceso" className="text-foreground hover:text-primary transition-colors">
+                Proceso
+              </a>
+              <a href="#testimonios" className="text-foreground hover:text-primary transition-colors">
+                Testimonios
+              </a>
+              <Button onClick={scrollToForm} className="bg-primary hover:bg-primary/90">
+                Empezar ahora
+              </Button>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden text-foreground z-50">
+              {isMobileMenuOpen ? <Menu className="h-6 w-6 rotate-90 transition-all" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Menu - mismo fondo (transparente+blur), sin fondo distinto */}
+        <AnimatePresence initial={false}>
+          {isMobileMenuOpen && (
             <motion.div
-              className="container mx-auto px-4 py-6 space-y-4"
-              variants={listVariants}
+              key="mobile-panel"
+              variants={panelVariants}
               initial="closed"
               animate="open"
               exit="closed"
+              className="md:hidden bg-transparent backdrop-blur-2xl mx-2 mt-2 overflow-hidden z-50"
+              style={{ WebkitBackdropFilter: 'blur(32px)' }}
             >
-              <motion.a variants={itemVariants}
-                href="#beneficios"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block text-foreground hover:text-primary transition-colors py-2"
+              <motion.div
+                className="container mx-auto px-4 py-6 space-y-4"
+                variants={listVariants}
+                initial="closed"
+                animate="open"
+                exit="closed"
               >
-                Beneficios
-              </motion.a>
-              <motion.a variants={itemVariants}
-                href="#proceso"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block text-foreground hover:text-primary transition-colors py-2"
-              >
-                Proceso
-              </motion.a>
-              <motion.a variants={itemVariants}
-                href="#testimonios"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block text-foreground hover:text-primary transition-colors py-2"
-              >
-                Testimonios
-              </motion.a>
-              <motion.div variants={itemVariants}>
-                <Button onClick={scrollToForm} className="w-full bg-primary hover:bg-primary/90">
-                  Empezar ahora
-                </Button>
+                <motion.a variants={itemVariants}
+                  href="#beneficios"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block text-foreground hover:text-primary transition-colors py-2"
+                >
+                  Beneficios
+                </motion.a>
+                <motion.a variants={itemVariants}
+                  href="#proceso"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block text-foreground hover:text-primary transition-colors py-2"
+                >
+                  Proceso
+                </motion.a>
+                <motion.a variants={itemVariants}
+                  href="#testimonios"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block text-foreground hover:text-primary transition-colors py-2"
+                >
+                  Testimonios
+                </motion.a>
+                <motion.div variants={itemVariants}>
+                  <Button onClick={scrollToForm} className="w-full bg-primary hover:bg-primary/90">
+                    Empezar ahora
+                  </Button>
+                </motion.div>
               </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </nav>
+          )}
+        </AnimatePresence>
+      </nav>
+    </>
   )
 }

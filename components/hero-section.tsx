@@ -67,9 +67,12 @@ export function HeroSection() {
           className="max-w-4xl mx-auto space-y-6 md:space-y-8"
         >
           <h2 className="text-3xl md:text-6xl font-bold text-foreground leading-tight text-balance">
-            <span className="sm:inline block">Tu coche hasta</span>
-            <br className="block sm:hidden" />
-            <span className="inline-flex items-baseline gap-2 whitespace-nowrap">
+            {/* Línea 1 móvil / inline desktop */}
+            <span className="block sm:inline">Tu coche hasta</span>
+            {/* Separador sólo para desktop */}
+            <span className="hidden sm:inline"> </span>
+            {/* Línea 2 móvil: número + "menos" unidos en una sola línea */}
+            <span className="block sm:inline whitespace-nowrap">
               <motion.span 
                 ref={percentRef}
                 initial={{ y: 30, opacity: 0 }}
@@ -79,8 +82,12 @@ export function HeroSection() {
               >
                 {percent}%
               </motion.span>
-              <span>menos que en España</span>
+              <span> menos</span>
             </span>
+            {/* Separador sólo para desktop */}
+            <span className="hidden sm:inline"> </span>
+            {/* Línea 3 móvil */}
+            <span className="block sm:inline">que en España</span>
           </h2>
 
           <p className="text-lg md:text-2xl text-muted-foreground max-w-2xl mx-auto text-pretty">
