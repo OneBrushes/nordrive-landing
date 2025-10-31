@@ -67,17 +67,20 @@ export function HeroSection() {
           className="max-w-4xl mx-auto space-y-6 md:space-y-8"
         >
           <h2 className="text-3xl md:text-6xl font-bold text-foreground leading-tight text-balance">
-            Tu coche hasta{' '}
-            <motion.span 
-              ref={percentRef}
-              initial={{ y: 30, opacity: 0 }}
-              animate={started ? { y: 0, opacity: 1 } : {}}
-              transition={{ duration: 0.45, type: 'spring' }}
-              className="inline-block text-primary"
-            >
-              {percent}%
-            </motion.span>
-            {' '}menos que en España
+            <span className="sm:inline block">Tu coche hasta</span>
+            <br className="block sm:hidden" />
+            <span className="inline-flex items-baseline gap-2 whitespace-nowrap">
+              <motion.span 
+                ref={percentRef}
+                initial={{ y: 30, opacity: 0 }}
+                animate={started ? { y: 0, opacity: 1 } : {}}
+                transition={{ duration: 0.45, type: 'spring' }}
+                className="inline-block text-primary"
+              >
+                {percent}%
+              </motion.span>
+              <span>menos que en España</span>
+            </span>
           </h2>
 
           <p className="text-lg md:text-2xl text-muted-foreground max-w-2xl mx-auto text-pretty">
