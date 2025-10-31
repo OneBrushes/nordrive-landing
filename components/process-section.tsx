@@ -89,7 +89,7 @@ export function ProcessSection() {
           <div className="inline-flex items-center gap-3 bg-primary/10 border border-primary/20 rounded-full px-4 md:px-6 py-2 md:py-3">
             <CheckCircle className="w-5 h-5 text-primary" />
             <p className="text-sm font-medium text-foreground">
-              Si el coche no te convence, solo pagas los gastos del viaje y seguimos buscando
+              Si el coche no te convence, seguimos buscando hasta que lo encuentres
             </p>
           </div>
         </motion.div>

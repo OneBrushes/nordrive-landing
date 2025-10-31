@@ -13,7 +13,7 @@ const testimonials = [
     image: "/client-with-bmw.jpg",
   },
   {
-    name: "Laura G.",
+    name: "Pablo G.",
     location: "Barcelona",
     car: "Audi A4 Avant",
     rating: 5,
