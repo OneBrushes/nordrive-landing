@@ -41,7 +41,7 @@ export function BenefitsSection() {
           className="text-center mb-8 md:mb-16"
         >
           <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-3 md:mb-4 text-balance">
-            Cómo funciona nordrive
+            Cómo funciona NorDrive
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto text-pretty">
             Un servicio personalizado de principio a fin

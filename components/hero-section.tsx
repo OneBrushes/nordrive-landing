@@ -93,14 +93,35 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
             >
-              <Button
-                size="lg"
-                onClick={scrollToForm}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground text-base md:text-lg px-6 md:px-8 py-5 md:py-6 rounded-lg transition-all hover:scale-105"
-              >
-                Solicita tu coche gratis
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+              {
+                (() => {
+                  const [hover, setHover] = useState(false);
+                  const arrowVariants = {
+                    hidden: { opacity: 0, x: -32 },
+                    enter:  { opacity: 1, x: 0,  transition: { duration: 0.35, ease: 'easeOut' } },
+                    exit:   { opacity: 0, x: 28, transition: { duration: 0.25, ease: 'easeIn' } },
+                  } as const;
+                  return (
+                    <Button
+                      size="lg"
+                      onClick={scrollToForm}
+                      onMouseEnter={() => setHover(true)}
+                      onMouseLeave={() => setHover(false)}
+                      className="relative overflow-hidden bg-primary hover:bg-primary/90 text-primary-foreground text-base md:text-lg px-6 md:px-8 py-5 md:py-6 rounded-lg transition-all hover:scale-105"
+                    >
+                      <span className="relative z-10">Solicita tu coche gratis</span>
+                      <motion.span
+                        className="absolute right-4 top-1/2 -translate-y-1/2 z-10"
+                        variants={arrowVariants}
+                        initial="hidden"
+                        animate={hover ? "enter" : "exit"}
+                      >
+                        <ArrowRight className="h-5 w-5" />
+                      </motion.span>
+                    </Button>
+                  );
+                })()
+              }
             </motion.div>
             <motion.p
               initial={{ opacity: 0 }}

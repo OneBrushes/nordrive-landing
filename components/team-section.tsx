@@ -4,24 +4,12 @@ import { motion } from "framer-motion"
 
 const team = [
   {
-    name: "Juan Pérez",
-    role: "Fundador & Import Manager",
-    desc: "Especialista en importación y verificación de vehículos en Alemania. Atención personalizada y +10 años de experiencia en el sector.",
+    name: "Guillermo Fabregat",
+    role: "Fundador e Importador",
+    desc: "Ingeniero Mecánico y Especialista en Importación de Vehículos. Con un nivel C1 de Alemán. Más de 5 años analizando el mercado de importación de vehículos en España.",
     image: "/professional-man-portrait.png"
   },
-  {
-    name: "Lucía Martín",
-    role: "Asesora de Clientes",
-    desc: "Guía y solución a cada consulta durante todo el proceso. Transparencia y cercanía a cada cliente.",
-    image: "/professional-woman-portrait.png"
-  },
-  {
-    name: "Miguel Rodríguez",
-    role: "Técnico de Inspección",
-    desc: "Inspección técnica presencial y verificación en Alemania antes de cada compra.",
-    image: "/professional-man-portrait-2.png"
-  },
-]
+  ]
 
 export function TeamSection() {
   return (
