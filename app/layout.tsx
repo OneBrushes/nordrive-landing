@@ -7,7 +7,13 @@ const poppins = Poppins({ subsets: ['latin'], weight: ['400','500','600','700'] 
 
 export const metadata: Metadata = {
   title: 'Nordrive',
+  icons: {
+    icon: '/favicon.ico',          // si usas public/favicon.ico
+    shortcut: '/favicon.ico',
+  },
 }
+
+
 
 export default function RootLayout({
   children,

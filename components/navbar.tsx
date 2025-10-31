@@ -26,7 +26,7 @@ export function Navbar() {
     <nav
       className={`fixed z-50 left-1/2 -translate-x-1/2 transition-all duration-700 ease-in-out
         ${isScrolled
-          ? "top-4 w-full max-w-[1200px] rounded-2xl shadow-lg border border-primary/12 backdrop-blur-2xl"
+          ? "top-3 md:top-4 w-[calc(100vw-24px)] md:w-full md:max-w-[1200px] rounded-2xl shadow-lg border border-primary/12 backdrop-blur-2xl"
           : "top-0 w-full max-w-full rounded-none shadow-none border-transparent backdrop-blur-0"
         }`}
       style={{
