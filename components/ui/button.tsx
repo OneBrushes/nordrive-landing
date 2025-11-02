@@ -36,19 +36,6 @@ const buttonVariants = cva(
   },
 )
 
-function isFormCTA(children: React.ReactNode) {
-  if (!children) return false;
-  if (typeof children === 'string') {
-    const txt = children.toLowerCase()
-    return txt.includes('solicita') || txt.includes('empezar ahora') || txt.includes('tu coche gratis') || txt.includes('abrir formulario')
-  } else if (Array.isArray(children)) {
-    return children.some(c => isFormCTA(c))
-  } else if (typeof children === 'object' && 'props' in children && children.props && children.props.children) {
-    return isFormCTA(children.props.children)
-  }
-  return false;
-}
-
 function Button({
   className,
   variant,
@@ -62,26 +49,12 @@ function Button({
     asChild?: boolean
   }) {
   const Comp = asChild ? Slot : 'button'
-  // intercept CTA: scroll to #formulario o abrir Tally en nueva pestaña en móvil
-  function handleClick(e) {
-    if(isFormCTA(children)){
-      // si existe el elemento 'formulario', scroll. Sino, abre tally.
-      const tgt = document.getElementById('formulario')
-      if(tgt) {
-        tgt.scrollIntoView({behavior: 'smooth'}); e.preventDefault(); return;
-      }
-      window.open("https://tally.so/r/YOUR_FORM_ID",'_blank');
-      e.preventDefault();
-      return;
-    }
-    if(onClick) onClick(e);
-  }
 
   return (
     <Comp
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
-      onClick={handleClick}
+      onClick={onClick}
       {...props}
     >
       {children}

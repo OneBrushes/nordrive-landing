@@ -23,7 +23,7 @@ export function HeroSection() {
         if (i < 30) {
           const remaining = 30 - i;
           // Frena mucho más al final (más visible)
-          let step = Math.max(0.01, 0.5 * Math.pow(remaining / 30, 1.8));
+          let step = Math.max(0.04, 0.5 * Math.pow(remaining / 30, 2));
           i += step;
           frame = requestAnimationFrame(animate);
         }

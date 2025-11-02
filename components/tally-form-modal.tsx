@@ -4,6 +4,14 @@ import { motion, AnimatePresence } from "framer-motion"
 import { X } from "lucide-react"
 import { useEffect } from "react"
 
+declare global {
+  interface Window {
+    Tally?: {
+      loadEmbeds?: () => void
+    }
+  }
+}
+
 interface TallyFormModalProps {
   isOpen: boolean
   onClose: () => void
@@ -30,7 +38,18 @@ export function TallyFormModal({ isOpen, onClose }: TallyFormModalProps) {
         const script = document.createElement('script')
         script.src = 'https://tally.so/widgets/embed.js'
         script.async = true
+        script.onload = () => {
+          // Forzar inicialización de Tally después de cargar el script
+          if (window.Tally) {
+            window.Tally.loadEmbeds()
+          }
+        }
         document.body.appendChild(script)
+      } else {
+        // Si ya existe, forzar reinicialización
+        if (window.Tally) {
+          window.Tally.loadEmbeds()
+        }
       }
     }
   }, [isOpen])
@@ -67,7 +86,7 @@ export function TallyFormModal({ isOpen, onClose }: TallyFormModalProps) {
             </button>
 
             {/* Iframe del formulario Tally */}
-            <div className="w-full h-full">
+            <div className="w-full h-full relative">
               <iframe
                 data-tally-src="https://tally.so/r/nrN7dX?transparentBackground=1&formEventsForwarding=1"
                 width="100%"
@@ -76,8 +95,9 @@ export function TallyFormModal({ isOpen, onClose }: TallyFormModalProps) {
                 marginHeight={0}
                 marginWidth={0}
                 title="Bienvenido al formulario oficial de NorDrive"
-                className="absolute inset-0"
-                style={{ border: 'none' }}
+                className="absolute inset-0 w-full h-full"
+                style={{ border: 'none', display: 'block' }}
+                allow="clipboard-read; clipboard-write"
               />
             </div>
           </motion.div>
