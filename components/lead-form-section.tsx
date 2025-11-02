@@ -3,12 +3,10 @@
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { ExternalLink } from "lucide-react"
+import { useTallyModal } from "@/contexts/tally-modal-context"
 
 export function LeadFormSection() {
-  const handleTallyClick = () => {
-    // Replace with your actual Tally form URL
-    window.open("https://tally.so")
-  }
+  const { openModal } = useTallyModal()
 
   return (
     <section id="formulario" className="py-12 md:py-24 relative">
@@ -25,7 +23,7 @@ export function LeadFormSection() {
               Empieza tu búsqueda gratis
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground text-pretty">
-              Sin compromiso · Te respondo en menos de 24 horas
+              Sin compromiso · Te respondemos en menos de 24 horas
             </p>
           </motion.div>
 
@@ -40,15 +38,15 @@ export function LeadFormSection() {
               <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
                 <ExternalLink className="w-10 h-10 text-primary" />
               </div>
-              <h3 className="text-xl md:text-2xl font-bold text-foreground mb-3 md:mb-4">Cuéntame qué coche buscas</h3>
+              <h3 className="text-xl md:text-2xl font-bold text-foreground mb-3 md:mb-4">Cuéntanos qué coche buscas</h3>
               <p className="text-muted-foreground leading-relaxed max-w-xl mx-auto">
-                Completa un breve formulario para que pueda entender exactamente lo que necesitas. Te haré algunas
+                Completa un breve formulario para que puedamos entender exactamente lo que necesitas. Te haremos algunas
                 preguntas sobre tu presupuesto, preferencias y plazos.
               </p>
             </div>
 
             <Button
-              onClick={handleTallyClick}
+              onClick={openModal}
               size="lg"
               className="bg-primary hover:bg-primary/90 text-primary-foreground text-base md:text-lg px-6 md:px-8 py-5 md:py-6 rounded-lg transition-all hover:scale-105"
             >
@@ -57,7 +55,7 @@ export function LeadFormSection() {
             </Button>
 
             <p className="text-sm text-muted-foreground mt-4 md:mt-6">
-              El formulario se abre en una nueva ventana · Solo 2-3 minutos
+              Completa el formulario · Solo 2 minutos
             </p>
           </motion.div>
         </div>

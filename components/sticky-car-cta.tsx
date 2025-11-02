@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useTallyModal } from "@/contexts/tally-modal-context"
 
 function isInViewport(selector: string) {
   const el = document.getElementById(selector)
@@ -14,6 +15,7 @@ function isInViewport(selector: string) {
 
 export function StickyCarCTA() {
   const [show, setShow] = useState(false)
+  const { openModal } = useTallyModal()
 
   useEffect(() => {
     const handle = () => {
@@ -32,10 +34,7 @@ export function StickyCarCTA() {
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault()
-    const tgt = document.getElementById('formulario')
-    if (tgt) {
-      tgt.scrollIntoView({behavior: 'smooth'})
-    }
+    openModal()
   }
 
   return (

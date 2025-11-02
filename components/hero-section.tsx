@@ -4,11 +4,10 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 import { motion } from "framer-motion"
 import { useState, useRef, useEffect } from "react"
+import { useTallyModal } from "@/contexts/tally-modal-context"
 
 export function HeroSection() {
-  const scrollToForm = () => {
-    document.getElementById("formulario")?.scrollIntoView({ behavior: "smooth" })
-  }
+  const { openModal } = useTallyModal()
 
   // Contador animado de porcentaje con observer
   const [percent, setPercent] = useState(0);
@@ -111,7 +110,7 @@ export function HeroSection() {
                   return (
                     <Button
                       size="lg"
-                      onClick={scrollToForm}
+                      onClick={openModal}
                       onMouseEnter={() => setHover(true)}
                       onMouseLeave={() => setHover(false)}
                       className="relative overflow-hidden bg-primary hover:bg-primary/90 text-primary-foreground text-base md:text-lg px-6 md:px-8 py-5 md:py-6 rounded-lg transition-all hover:scale-105"

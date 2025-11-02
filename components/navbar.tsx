@@ -4,10 +4,12 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Menu, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useTallyModal } from "@/contexts/tally-modal-context"
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { openModal } = useTallyModal()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,8 +19,8 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const scrollToForm = () => {
-    document.getElementById("formulario")?.scrollIntoView({ behavior: "smooth" })
+  const handleFormClick = () => {
+    openModal()
     setIsMobileMenuOpen(false)
   }
 
@@ -90,14 +92,14 @@ export function Navbar() {
               <a href="#testimonios" className="text-foreground hover:text-primary transition-colors">
                 Testimonios
               </a>
-              <Button onClick={scrollToForm} className="bg-primary hover:bg-primary/90">
+              <Button onClick={handleFormClick} className="bg-primary hover:bg-primary/90">
                 Empezar ahora
               </Button>
             </div>
 
             {/* Mobile Menu Button */}
             <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="md:hidden text-foreground z-50">
-              {isMobileMenuOpen ? <Menu className="h-6 w-6 rotate-90 transition-all" /> : <Menu className="h-6 w-6" />}
+              {isMobileMenuOpen ? <X className="h-6 w-6 transition-all" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
@@ -143,7 +145,7 @@ export function Navbar() {
                   Testimonios
                 </motion.a>
                 <motion.div variants={itemVariants}>
-                  <Button onClick={scrollToForm} className="w-full bg-primary hover:bg-primary/90">
+                  <Button onClick={handleFormClick} className="w-full bg-primary hover:bg-primary/90">
                     Empezar ahora
                   </Button>
                 </motion.div>
