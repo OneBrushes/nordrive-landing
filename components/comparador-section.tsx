@@ -28,7 +28,7 @@ export function ComparadorSection() {
             <span className="text-4xl font-bold mt-4 mb-2 text-primary">19.990 €</span>
           </motion.div>
           <motion.div initial={{opacity:0,y:20}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{duration:0.7, delay:0.23}} className="bg-card/70 rounded-xl flex flex-col items-center justify-center py-8 px-5 border border-border">
-            <span className="text-muted-foreground font-medium mb-2">Ahorro típico</span>
+            <span className="text-muted-foreground font-medium mb-2">Ahorro medio</span>
             <span className="text-3xl font-bold text-green-600">5.510 €</span>
           </motion.div>
         </div>

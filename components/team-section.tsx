@@ -7,7 +7,7 @@ const team = [
     name: "Guillermo Fabregat",
     role: "Fundador e Importador",
     desc: "Ingeniero Mecánico y Especialista en Importación de Vehículos. Con un nivel C1 de Alemán. Más de 5 años analizando el mercado de importación de vehículos en España.",
-    image: "/professional-man-portrait.png"
+    image: "/Foto-perfil-guille.webp"
   },
   ]
 
