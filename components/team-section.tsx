@@ -1,6 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
+import { withBasePath } from "@/lib/utils"
 
 const team = [
   {
@@ -9,7 +10,7 @@ const team = [
     desc: "Ingeniero Mecánico y Especialista en Importación de Vehículos. Con un nivel C1 de Alemán. Más de 5 años analizando el mercado de importación de vehículos en España.",
     image: "/fotoperfilguille.webp"
   },
-  ]
+]
 
 export function TeamSection() {
   return (
@@ -40,7 +41,11 @@ export function TeamSection() {
               transition={{ duration: 0.6, delay: idx*0.08 }}
               className="bg-card/50 rounded-2xl shadow-lg border border-border backdrop-blur-lg p-7 md:p-9 max-w-xs w-full flex flex-col items-center text-center hover:scale-[1.03] hover:shadow-2xl transition-all"
             >
-              <img src={persona.image} className="w-24 h-24 mb-5 rounded-full object-cover border-2 border-primary shadow-md" alt={persona.name} />
+              <img
+                src={withBasePath(persona.image)}
+                className="w-24 h-24 mb-5 rounded-full object-cover border-2 border-primary shadow-md"
+                alt={persona.name}
+              />
               <div className="font-semibold text-lg text-foreground">{persona.name}</div>
               <div className="font-medium text-primary mb-2">{persona.role}</div>
               <div className="text-muted-foreground text-sm">{persona.desc}</div>

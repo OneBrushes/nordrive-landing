@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import { Star } from "lucide-react"
+import { withBasePath } from "@/lib/utils"
 
 const testimonials = [
   {
@@ -72,7 +73,7 @@ export function TestimonialsSection() {
               <div className="bg-card/50 backdrop-blur-sm border border-border rounded-2xl overflow-hidden transition-all hover:bg-card/70 hover:border-primary/50 hover:scale-[1.02]">
                 <div className="relative h-64 md:h-80 overflow-hidden">
                   <img
-                    src={testimonial.image || "/placeholder.svg"}
+                    src={withBasePath(testimonial.image || "/placeholder.svg")}
                     alt={`${testimonial.name} con su ${testimonial.car}`}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
