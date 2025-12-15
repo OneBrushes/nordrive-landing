@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react"
 import { motion } from "framer-motion"
 import { useState, useRef, useEffect } from "react"
 import { useTallyModal } from "@/contexts/tally-modal-context"
+import { withBasePath } from "@/lib/utils"
 
 export function HeroSection() {
   const { openModal } = useTallyModal()
@@ -51,7 +52,7 @@ export function HeroSection() {
       {/* Background Image with Blur Overlay */}
       <div className="absolute inset-0 z-0">
         <img
-          src="/luxury-german-cars-bmw-mercedes-audi-showroom.jpg"
+          src={withBasePath("/luxury-german-cars-bmw-mercedes-audi-showroom.jpg")}
           alt="Luxury German Cars"
           className="w-full h-full object-cover"
         />

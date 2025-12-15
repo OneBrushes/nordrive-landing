@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Menu, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTallyModal } from "@/contexts/tally-modal-context"
+import { withBasePath } from "@/lib/utils"
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -75,7 +76,7 @@ export function Navbar() {
           >
             <div className="flex items-center gap-3">
               <img
-                src="/Logo.png"
+                src={withBasePath("/Logo.png")}
                 alt="nordrive Logo"
                 className={`w-auto object-contain transition-all duration-700 ease-in-out ${showGlass ? "h-8" : "h-12"}`}
               />
