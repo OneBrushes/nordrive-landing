@@ -36,6 +36,9 @@ jobs:
           NEXT_PUBLIC_BASE_PATH: "/${{ github.event.repository.name }}"
           NEXT_TELEMETRY_DISABLED: 1
 
+      - name: Add .nojekyll
+        run: echo "" > ./out/.nojekyll
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
