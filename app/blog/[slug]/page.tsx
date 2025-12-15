@@ -2,6 +2,9 @@ import { notFound } from 'next/navigation'
 import { posts } from '@/content/blog/posts'
 import { withBasePath } from '@/lib/utils'
 
+// Deshabilitamos params dinámicos para que sólo existan los slugs generados y se exporten en estático
+export const dynamicParams = false
+
 type Props = {
   params: { slug: string }
 }
