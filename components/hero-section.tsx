@@ -94,7 +94,7 @@ export function HeroSection() {
             Búsqueda gratuita · Inspección profesional · Entrega en España
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center pt-2 md:pt-4">
+          <div className="flex flex-col items-center gap-3 md:gap-4 justify-center pt-2 md:pt-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
