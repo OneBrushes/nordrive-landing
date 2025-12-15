@@ -7,11 +7,13 @@ import { TallyModalProvider } from "@/contexts/tally-modal-context"
 
 const poppins = Poppins({ subsets: ['latin'], weight: ['400','500','600','700'] });
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
+
 export const metadata: Metadata = {
   title: 'Nordrive',
   icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon.ico',
+    icon: `${basePath}/favicon.ico`,
+    shortcut: `${basePath}/favicon.ico`,
   },
 }
 
