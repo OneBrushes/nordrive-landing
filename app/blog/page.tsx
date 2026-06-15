@@ -1,15 +1,21 @@
-﻿import Link from 'next/link'
+"use client"
+
+import Link from 'next/link'
 import Image from 'next/image'
 import { posts } from '@/content/blog/posts'
 import { withBasePath } from '@/lib/utils'
+import { ArrowLeft } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })
 }
 
-export default function BlogPage({ searchParams }: { searchParams: { page?: string, order?: 'asc'|'desc' } }) {
-  const page = Math.max(1, parseInt(searchParams?.page || '1', 10))
-  const order = (searchParams?.order === 'asc' ? 'asc' : 'desc') as 'asc'|'desc'
+function BlogList() {
+  const searchParams = useSearchParams()
+  const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10))
+  const order = (searchParams.get('order') === 'asc' ? 'asc' : 'desc') as 'asc'|'desc'
   const pageSize = 6
 
   const visible = posts.filter(p => !p.draft)
@@ -23,7 +29,7 @@ export default function BlogPage({ searchParams }: { searchParams: { page?: stri
   const hasNext = current < totalPages
 
   return (
-    <main className="container mx-auto px-4 md:px-6 py-12 md:py-20 space-y-10">
+    <>
       <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
         <h1 className="text-3xl md:text-5xl font-bold">Mundo del motor</h1>
         <div className="flex items-center gap-2 text-sm">
@@ -79,6 +85,23 @@ export default function BlogPage({ searchParams }: { searchParams: { page?: stri
           Siguiente
         </Link>
       </div>
+    </>
+  )
+}
+
+export default function BlogPage() {
+  return (
+    <main className="container mx-auto px-4 md:px-6 py-12 md:py-20 space-y-10">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group">
+          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+          Volver al inicio
+        </Link>
+      </div>
+
+      <Suspense fallback={<div className="text-muted-foreground">Cargando artículos...</div>}>
+        <BlogList />
+      </Suspense>
     </main>
   )
 }
