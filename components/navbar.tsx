@@ -6,6 +6,7 @@ import { Menu, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTallyModal } from "@/contexts/tally-modal-context"
 import { withBasePath } from "@/lib/utils"
+import Link from "next/link"
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -74,23 +75,26 @@ export function Navbar() {
           <div
             className={`flex items-center justify-between transition-all duration-700 ease-in-out ${showGlass ? "h-16" : "h-20"}`}
           >
-            <div className="flex items-center gap-3">
+            <Link href={withBasePath("/")} className="flex items-center gap-3 cursor-pointer">
               <img
                 src={withBasePath("/Logo.png")}
                 alt="nordrive Logo"
                 className={`w-auto object-contain transition-all duration-700 ease-in-out ${showGlass ? "h-8" : "h-12"}`}
               />
-            </div>
+            </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-8">
-              <a href="#beneficios" className="text-foreground hover:text-primary transition-colors">
+              <a href={withBasePath("/#beneficios")} className="text-foreground hover:text-primary transition-colors">
                 Beneficios
               </a>
-              <a href="#proceso" className="text-foreground hover:text-primary transition-colors">
+              <a href={withBasePath("/#proceso")} className="text-foreground hover:text-primary transition-colors">
                 Proceso
               </a>
-              <a href="#testimonios" className="text-foreground hover:text-primary transition-colors">
+              <a href={withBasePath("/coches/")} className="text-foreground hover:text-primary transition-colors">
+                Coches en venta
+              </a>
+              <a href={withBasePath("/#testimonios")} className="text-foreground hover:text-primary transition-colors">
                 Testimonios
               </a>
               <Button onClick={handleFormClick} className="bg-primary hover:bg-primary/90">
@@ -125,21 +129,28 @@ export function Navbar() {
                 exit="closed"
               >
                 <motion.a variants={itemVariants}
-                  href="#beneficios"
+                  href={withBasePath("/#beneficios")}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="block text-foreground hover:text-primary transition-colors py-2"
                 >
                   Beneficios
                 </motion.a>
                 <motion.a variants={itemVariants}
-                  href="#proceso"
+                  href={withBasePath("/#proceso")}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="block text-foreground hover:text-primary transition-colors py-2"
                 >
                   Proceso
                 </motion.a>
                 <motion.a variants={itemVariants}
-                  href="#testimonios"
+                  href={withBasePath("/coches/")}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block text-foreground hover:text-primary transition-colors py-2"
+                >
+                  Coches en venta
+                </motion.a>
+                <motion.a variants={itemVariants}
+                  href={withBasePath("/#testimonios")}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="block text-foreground hover:text-primary transition-colors py-2"
                 >
