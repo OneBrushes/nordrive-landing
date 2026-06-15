@@ -7,11 +7,17 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useTallyModal } from "@/contexts/tally-modal-context"
 import { withBasePath } from "@/lib/utils"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { openModal } = useTallyModal()
+  const pathname = usePathname()
+
+  const normalizedPath = pathname ? pathname.replace(/\/$/, "") : ""
+  const normalizedHome = withBasePath("/").replace(/\/$/, "")
+  const isHomePage = normalizedPath === normalizedHome || normalizedPath === ""
 
   useEffect(() => {
     const handleScroll = () => {
@@ -75,29 +81,44 @@ export function Navbar() {
           <div
             className={`flex items-center justify-between transition-all duration-700 ease-in-out ${showGlass ? "h-16" : "h-20"}`}
           >
-            <Link href={withBasePath("/")} className="flex items-center gap-3 cursor-pointer">
-              <img
-                src={withBasePath("/Logo.png")}
-                alt="nordrive Logo"
-                className={`w-auto object-contain transition-all duration-700 ease-in-out ${showGlass ? "h-8" : "h-12"}`}
-              />
-            </Link>
+            {isHomePage ? (
+              <div className="flex items-center gap-3 select-none">
+                <img
+                  src={withBasePath("/Logo.png")}
+                  alt="nordrive Logo"
+                  className={`w-auto object-contain transition-all duration-700 ease-in-out ${showGlass ? "h-8" : "h-12"}`}
+                />
+              </div>
+            ) : (
+              <Link href={withBasePath("/")} className="flex items-center gap-3 cursor-pointer">
+                <img
+                  src={withBasePath("/Logo.png")}
+                  alt="nordrive Logo"
+                  className={`w-auto object-contain transition-all duration-700 ease-in-out ${showGlass ? "h-8" : "h-12"}`}
+                />
+              </Link>
+            )}
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-8">
-              <a href={withBasePath("/#beneficios")} className="text-foreground hover:text-primary transition-colors">
+            <div className="hidden md:flex items-center gap-6">
+              <a href={withBasePath("/#beneficios")} className="text-foreground hover:text-primary transition-colors text-sm font-medium">
                 Beneficios
               </a>
-              <a href={withBasePath("/#proceso")} className="text-foreground hover:text-primary transition-colors">
+              <a href={withBasePath("/#proceso")} className="text-foreground hover:text-primary transition-colors text-sm font-medium">
                 Proceso
               </a>
-              <a href={withBasePath("/coches/")} className="text-foreground hover:text-primary transition-colors">
+              <a href={withBasePath("/coches/")} className="text-foreground hover:text-primary transition-colors text-sm font-medium">
                 Coches en venta
               </a>
-              <a href={withBasePath("/#testimonios")} className="text-foreground hover:text-primary transition-colors">
+              <a href={withBasePath("/#testimonios")} className="text-foreground hover:text-primary transition-colors text-sm font-medium">
                 Testimonios
               </a>
-              <Button onClick={handleFormClick} className="bg-primary hover:bg-primary/90">
+              <Link href={withBasePath("/clientes/")}>
+                <Button variant="outline" size="sm" className="border-primary/20 text-foreground hover:bg-primary/10 rounded-lg text-xs h-9">
+                  Área Clientes
+                </Button>
+              </Link>
+              <Button onClick={handleFormClick} size="sm" className="bg-primary hover:bg-primary/90 rounded-lg text-xs h-9">
                 Empezar ahora
               </Button>
             </div>
@@ -156,8 +177,15 @@ export function Navbar() {
                 >
                   Testimonios
                 </motion.a>
+                <motion.div variants={itemVariants} className="pt-2">
+                  <Link href={withBasePath("/clientes/")} onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="outline" className="w-full border-primary/20 text-foreground hover:bg-primary/10 rounded-lg">
+                      Área Clientes
+                    </Button>
+                  </Link>
+                </motion.div>
                 <motion.div variants={itemVariants}>
-                  <Button onClick={handleFormClick} className="w-full bg-primary hover:bg-primary/90">
+                  <Button onClick={handleFormClick} className="w-full bg-primary hover:bg-primary/90 rounded-lg">
                     Empezar ahora
                   </Button>
                 </motion.div>
