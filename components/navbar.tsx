@@ -84,16 +84,16 @@ export function Navbar() {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-8">
-              <a href="#beneficios" className="text-foreground hover:text-primary transition-colors">
+              <a href={withBasePath("/#beneficios")} className="text-foreground hover:text-primary transition-colors">
                 Beneficios
               </a>
-              <a href="#proceso" className="text-foreground hover:text-primary transition-colors">
+              <a href={withBasePath("/#proceso")} className="text-foreground hover:text-primary transition-colors">
                 Proceso
               </a>
-              <a href="#coches-venta" className="text-foreground hover:text-primary transition-colors">
+              <a href={withBasePath("/coches/")} className="text-foreground hover:text-primary transition-colors">
                 Coches en venta
               </a>
-              <a href="#testimonios" className="text-foreground hover:text-primary transition-colors">
+              <a href={withBasePath("/#testimonios")} className="text-foreground hover:text-primary transition-colors">
                 Testimonios
               </a>
               <Button onClick={handleFormClick} className="bg-primary hover:bg-primary/90">
@@ -128,28 +128,28 @@ export function Navbar() {
                 exit="closed"
               >
                 <motion.a variants={itemVariants}
-                  href="#beneficios"
+                  href={withBasePath("/#beneficios")}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="block text-foreground hover:text-primary transition-colors py-2"
                 >
                   Beneficios
                 </motion.a>
                 <motion.a variants={itemVariants}
-                  href="#proceso"
+                  href={withBasePath("/#proceso")}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="block text-foreground hover:text-primary transition-colors py-2"
                 >
                   Proceso
                 </motion.a>
                 <motion.a variants={itemVariants}
-                  href="#coches-venta"
+                  href={withBasePath("/coches/")}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="block text-foreground hover:text-primary transition-colors py-2"
                 >
                   Coches en venta
                 </motion.a>
                 <motion.a variants={itemVariants}
-                  href="#testimonios"
+                  href={withBasePath("/#testimonios")}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="block text-foreground hover:text-primary transition-colors py-2"
                 >
