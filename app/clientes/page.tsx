@@ -99,13 +99,13 @@ export default function ClientesPage() {
           {/* Progreso ficticio animado */}
           <div className="max-w-xs mx-auto mb-10 space-y-2">
             <div className="flex justify-between text-xs text-muted-foreground font-medium">
-              <span>Ajustando tornillos...</span>
-              <span>85% listo</span>
+              <span>Calentando motores...</span>
+              <span>10% listo</span>
             </div>
             <div className="w-full h-3 bg-muted rounded-full overflow-hidden border border-border">
               <motion.div
                 initial={{ width: 0 }}
-                animate={{ width: "85%" }}
+                animate={{ width: "10%" }}
                 transition={{ duration: 2, delay: 0.5, ease: "easeOut" }}
                 className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full"
               />
