@@ -11,7 +11,7 @@ export function CarsSection() {
   const { openModal } = useTallyModal()
 
   return (
-    <section id="coches-venta" className="py-16 md:py-24 bg-card/10 border-t border-border">
+    <section id="coches-venta" className="py-16 md:py-24 bg-card/10">
       <div className="container mx-auto px-4">
         
         {/* Encabezado */}

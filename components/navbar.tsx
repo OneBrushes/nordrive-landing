@@ -6,6 +6,7 @@ import { Menu, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTallyModal } from "@/contexts/tally-modal-context"
 import { withBasePath } from "@/lib/utils"
+import Link from "next/link"
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -74,13 +75,13 @@ export function Navbar() {
           <div
             className={`flex items-center justify-between transition-all duration-700 ease-in-out ${showGlass ? "h-16" : "h-20"}`}
           >
-            <div className="flex items-center gap-3">
+            <Link href={withBasePath("/")} className="flex items-center gap-3 cursor-pointer">
               <img
                 src={withBasePath("/Logo.png")}
                 alt="nordrive Logo"
                 className={`w-auto object-contain transition-all duration-700 ease-in-out ${showGlass ? "h-8" : "h-12"}`}
               />
-            </div>
+            </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-8">
