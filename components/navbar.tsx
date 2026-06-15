@@ -90,6 +90,9 @@ export function Navbar() {
               <a href="#proceso" className="text-foreground hover:text-primary transition-colors">
                 Proceso
               </a>
+              <a href="#coches-venta" className="text-foreground hover:text-primary transition-colors">
+                Coches en venta
+              </a>
               <a href="#testimonios" className="text-foreground hover:text-primary transition-colors">
                 Testimonios
               </a>
@@ -137,6 +140,13 @@ export function Navbar() {
                   className="block text-foreground hover:text-primary transition-colors py-2"
                 >
                   Proceso
+                </motion.a>
+                <motion.a variants={itemVariants}
+                  href="#coches-venta"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block text-foreground hover:text-primary transition-colors py-2"
+                >
+                  Coches en venta
                 </motion.a>
                 <motion.a variants={itemVariants}
                   href="#testimonios"

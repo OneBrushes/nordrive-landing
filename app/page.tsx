@@ -3,6 +3,7 @@ import { HeroSection } from "@/components/hero-section"
 import { BenefitsSection } from "@/components/benefits-section"
 import { ProcessSection } from "@/components/process-section"
 import { ComparadorSection } from "@/components/comparador-section"
+import { CarsSection } from "@/components/cars-section"
 // import { SuccessStoriesSection } from "@/components/success-stories-section"
 import { LeadFormSection } from "@/components/lead-form-section"
 import { TestimonialsSection } from "@/components/testimonials-section"
@@ -19,6 +20,7 @@ export default function Home() {
       <BenefitsSection />
       <ProcessSection />
       <ComparadorSection />
+      <CarsSection />
       {/* <SuccessStoriesSection /> */}
       <LeadFormSection />
       <TestimonialsSection />
