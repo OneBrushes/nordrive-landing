@@ -22,20 +22,26 @@ import {
   Clock, 
   ChevronRight,
   X,
-  ShieldCheck,
-  Search,
-  Check,
-  ClipboardList,
+  Wrench,
+  Settings,
+  AlertTriangle,
+  ArrowLeft,
   Compass,
   Navigation,
-  Info
+  Info,
+  Check,
+  ClipboardList
 } from "lucide-react"
 
 export default function ClientesPage() {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
+  
+  // Control de estados de la demo local oculta
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [showHiddenLogin, setShowHiddenLogin] = useState(false)
+  const [clickCount, setClickCount] = useState(0)
   
   // Estado para el visor de fotos (Foto destacada)
   const [activePhotoIdx, setActivePhotoIdx] = useState(0)
@@ -46,7 +52,18 @@ export default function ClientesPage() {
   // Estado para abrir el sub-detalle de los 150 puntos (Categorías)
   const [selectedSubCatIdx, setSelectedSubCatIdx] = useState<number | null>(null)
 
-  // Datos del coche simulado del cliente (incluyendo variables que el panel de administración podrá modificar)
+  // Función del trigger secreto: Hacer click en la llave inglesa (Wrench) 5 veces
+  const handleSecretTrigger = () => {
+    const nextCount = clickCount + 1
+    if (nextCount >= 5) {
+      setShowHiddenLogin(true)
+      setClickCount(0)
+    } else {
+      setClickCount(nextCount)
+    }
+  }
+
+  // Datos del coche simulado del cliente
   const clientCar = {
     name: "Audi A4 Avant S-Line 2.0 TFSI",
     year: 2019,
@@ -55,11 +72,9 @@ export default function ClientesPage() {
     origin: "Frankfurt, Alemania",
     destination: "Madrid, España",
     status: "En transporte",
-    
-    // Variables dinámicas del transporte (Configurables desde el panel de control del administrador)
-    transportMode: "conduciendo", // "camion" (por carretera en camión) o "conduciendo" (pilotado en persona)
-    currentLocation: "Burdeos, Francia", // Dónde está actualmente el coche
-    routeProgress: 60, // Porcentaje de progreso del viaje (0 a 100)
+    transportMode: "conduciendo", 
+    currentLocation: "Burdeos, Francia", 
+    routeProgress: 60, 
     routeCities: [
       { name: "Frankfurt", label: "Origen", status: "passed" },
       { name: "Estrasburgo", label: "Control", status: "passed" },
@@ -67,7 +82,6 @@ export default function ClientesPage() {
       { name: "San Sebastián", label: "Aduana", status: "pending" },
       { name: "Madrid", label: "Destino", status: "pending" }
     ],
-
     steps: [
       { 
         title: "Búsqueda y selección", 
@@ -214,12 +228,13 @@ export default function ClientesPage() {
       setIsLoggedIn(true)
       setError("")
     } else {
-      setError("Usuario o contraseña incorrectos. Usa 'admin' / 'admin'.")
+      setError("Usuario o contraseña incorrectos.")
     }
   }
 
   const handleLogout = () => {
     setIsLoggedIn(false)
+    setShowHiddenLogin(false)
     setUsername("")
     setPassword("")
     setSelectedStepIdx(null)
@@ -227,27 +242,123 @@ export default function ClientesPage() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col justify-between pt-24 bg-gradient-to-b from-background via-card/10 to-background overflow-hidden relative">
+    <main className="min-h-screen flex flex-col justify-between pt-24 bg-gradient-to-b from-background via-card/20 to-background overflow-hidden relative">
       <Navbar />
 
-      <div className="flex-grow container mx-auto px-4 py-8 md:py-16 relative z-10 flex items-center justify-center">
+      {/* Elementos flotantes decorativos animados de fondo (solo visibles si no está el dashboard) */}
+      {!isLoggedIn && !showHiddenLogin && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+          <motion.div
+            animate={{ y: [0, -15, 0], rotate: 360 }}
+            transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+            className="absolute top-1/4 left-10 md:left-24 text-primary/10"
+          >
+            <Settings className="h-24 w-24 md:h-36 md:w-36" />
+          </motion.div>
+          <motion.div
+            animate={{ y: [0, 20, 0], rotate: -360 }}
+            transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+            className="absolute bottom-1/4 right-10 md:right-24 text-primary/10"
+          >
+            <Settings className="h-32 w-32 md:h-44 md:w-44" />
+          </motion.div>
+        </div>
+      )}
+
+      {/* Contenido Principal */}
+      <div className="flex-grow flex items-center justify-center container mx-auto px-4 py-12 md:py-16 relative z-10">
         <AnimatePresence mode="wait">
-          {!isLoggedIn ? (
-            
-            /* --- PANTALLA DE LOGIN --- */
+          
+          {/* VISTA 1: EN CONSTRUCCIÓN (PÚBLICA POR DEFECTO) */}
+          {!isLoggedIn && !showHiddenLogin && (
+            <motion.div
+              key="construction"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.4 }}
+              className="max-w-2xl w-full bg-card/60 backdrop-blur-xl border border-primary/15 rounded-3xl p-8 md:p-12 text-center shadow-2xl relative overflow-hidden"
+            >
+              <div className="absolute -top-20 -left-20 w-44 h-44 bg-primary/20 rounded-full blur-3xl" />
+              <div className="absolute -bottom-20 -right-20 w-44 h-44 bg-primary/25 rounded-full blur-3xl" />
+
+              {/* Botón trigger secreto en la llave inglesa (Click 5 veces para mostrar login) */}
+              <div className="flex justify-center items-center gap-4 mb-8">
+                <motion.button
+                  onClick={handleSecretTrigger}
+                  animate={{ rotate: [0, 15, -15, 0] }}
+                  transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                  className="bg-primary/10 p-4 rounded-2xl text-primary border border-primary/20 cursor-default focus:outline-none"
+                >
+                  <Wrench className="h-8 w-8" />
+                </motion.button>
+                <div className="bg-primary/5 p-3 rounded-2xl text-primary/80 border border-primary/10">
+                  <Settings className="h-6 w-6 animate-spin-slow" style={{ animationDuration: '10s' }} />
+                </div>
+                <div className="bg-amber-500/10 p-3 rounded-2xl text-amber-500 border border-amber-500/20">
+                  <AlertTriangle className="h-6 w-6" />
+                </div>
+              </div>
+
+              <div className="space-y-4 mb-10">
+                <h1 className="text-3xl md:text-5xl font-extrabold text-foreground tracking-tight">
+                  ¡Zona bajo el capó!
+                </h1>
+                <h2 className="text-lg md:text-xl font-semibold text-primary/85 uppercase tracking-wide">
+                  Área de Clientes en Desarrollo
+                </h2>
+                <p className="text-muted-foreground text-sm md:text-base leading-relaxed max-w-md mx-auto">
+                  Nuestros mecánicos de software y ingenieros digitales están poniendo a punto esta sección para que pronto puedas seguir la importación de tu coche en tiempo real. ¡Disculpa las salpicaduras de grasa digital en el código! 🧑‍💻⚙️
+                </p>
+              </div>
+
+              {/* Barra de progreso animada al 10% */}
+              <div className="max-w-xs mx-auto mb-10 space-y-2">
+                <div className="flex justify-between text-xs text-muted-foreground font-medium">
+                  <span>Calentando motores...</span>
+                  <span>10% listo</span>
+                </div>
+                <div className="w-full h-3 bg-muted rounded-full overflow-hidden border border-border">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: "10%" }}
+                    transition={{ duration: 2, delay: 0.5, ease: "easeOut" }}
+                    className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full"
+                  />
+                </div>
+              </div>
+
+              <Link href={withBasePath("/")} className="inline-block">
+                <Button className="bg-primary hover:bg-primary/95 text-primary-foreground font-semibold px-6 py-5 rounded-xl transition-all shadow-md hover:scale-105 inline-flex items-center gap-2">
+                  <ArrowLeft className="h-4 w-4" />
+                  Volver al taller principal
+                </Button>
+              </Link>
+            </motion.div>
+          )}
+
+          {/* VISTA 2: FORMULARIO DE ACCESO (ACCESIBLE POR EL PATRÓN SECRETO) */}
+          {!isLoggedIn && showHiddenLogin && (
             <motion.div
               key="login"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.4 }}
-              className="w-full max-w-md bg-card border border-border/70 rounded-3xl p-8 shadow-2xl relative"
+              className="w-full max-w-md bg-card border border-border/70 rounded-3xl p-8 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200"
             >
+              <button 
+                onClick={() => { setShowHiddenLogin(false); setError(""); }}
+                className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all"
+              >
+                <X className="h-5 w-5" />
+              </button>
+
               <div className="text-center space-y-2 mb-8">
                 <span className="text-primary text-xs font-semibold uppercase tracking-wider bg-primary/10 px-3 py-1 rounded-full">
                   Área Privada de Clientes
                 </span>
-                <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Sigue tu importación</h1>
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">Sigue tu importación</h1>
                 <p className="text-muted-foreground text-xs">
                   Introduce tus credenciales para ver el estado de tu coche.
                 </p>
@@ -261,10 +372,10 @@ export default function ClientesPage() {
                     <Input
                       id="username"
                       type="text"
-                      placeholder="Escribe 'admin'"
+                      placeholder="Introduce tu usuario"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
-                      className="pl-10 rounded-xl"
+                      className="pl-10 rounded-xl bg-background border-border"
                       required
                     />
                   </div>
@@ -277,10 +388,10 @@ export default function ClientesPage() {
                     <Input
                       id="password"
                       type="password"
-                      placeholder="Escribe 'admin'"
+                      placeholder="Introduce tu contraseña"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10 rounded-xl"
+                      className="pl-10 rounded-xl bg-background border-border"
                       required
                     />
                   </div>
@@ -296,20 +407,25 @@ export default function ClientesPage() {
                   </motion.p>
                 )}
 
-                <Button type="submit" className="w-full bg-primary hover:bg-primary/95 text-primary-foreground py-6 rounded-xl font-medium shadow">
-                  Entrar a mi portal
-                </Button>
+                <div className="flex gap-3">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => { setShowHiddenLogin(false); setError(""); }}
+                    className="w-1/3 border-border rounded-xl font-medium"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button type="submit" className="w-2/3 bg-primary hover:bg-primary/95 text-primary-foreground rounded-xl font-medium shadow">
+                    Entrar
+                  </Button>
+                </div>
               </form>
-
-              <div className="mt-6 text-center">
-                <p className="text-[11px] text-muted-foreground/80">
-                  Demo local: utiliza <strong>admin</strong> como usuario y contraseña.
-                </p>
-              </div>
             </motion.div>
-          ) : (
-            
-            /* --- DASHBOARD CLIENTE LOGUEADO --- */
+          )}
+
+          {/* VISTA 3: PANEL DE CONTROL DE CLIENTE COMPLETO */}
+          {isLoggedIn && (
             <motion.div
               key="dashboard"
               initial={{ opacity: 0, scale: 0.98 }}
@@ -549,7 +665,7 @@ export default function ClientesPage() {
                   {clientCar.steps[selectedStepIdx].title}
                 </h2>
                 <p className="text-xs text-muted-foreground">
-                  Fase finalizada el: <strong>{clientCar.steps[selectedStepIdx].date}</strong>
+                  Fase: <strong>{clientCar.steps[selectedStepIdx].date}</strong>
                 </p>
               </div>
 
@@ -572,7 +688,7 @@ export default function ClientesPage() {
                           </div>
                         )}
                         <div>
-                          <h4 className="font-bold text-sm">
+                          <h4 className="font-bold text-sm text-foreground">
                             {clientCar.transportMode === "conduciendo" ? "Modo: Pilotado en persona" : "Modo: Camión Portacoches"}
                           </h4>
                           <p className="text-xs text-muted-foreground">
