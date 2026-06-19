@@ -5,7 +5,11 @@ import Script from 'next/script'
 import './globals.css'
 import { TallyModalProvider } from "@/contexts/tally-modal-context"
 
-const poppins = Poppins({ subsets: ['latin'], weight: ['400','500','600','700'] });
+const poppins = Poppins({ 
+  subsets: ['latin'], 
+  weight: ['400','500','600','700'],
+  variable: '--font-poppins'
+});
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
 
@@ -24,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={poppins.className + ' font-sans antialiased'}>
+      <body className={`${poppins.variable} font-sans antialiased`}>
         <TallyModalProvider>
           {children}
         </TallyModalProvider>

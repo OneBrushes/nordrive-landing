@@ -75,7 +75,7 @@
 }
 
 @theme inline {
-  --font-sans: "Inter", "Inter Fallback";
+  --font-sans: var(--font-poppins), "Inter", "Inter Fallback", sans-serif;
 
   /* Color Palette - Dark Premium Theme */
   --color-background: #111827;
