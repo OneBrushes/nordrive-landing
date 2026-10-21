@@ -31,26 +31,23 @@ const MAX_CHIPS = 8
 export function ProposalCard({
   proposal,
   onReact,
+  onComment,
   onOpenPhotos,
 }: {
   proposal: PortalProposal
   /** Guarda la reacción; devuelve false si falla */
   onReact: (id: string, patch: ProposalPatch) => Promise<boolean>
+  /** Envía un mensaje a NorDrive sobre este coche; devuelve false si falla */
+  onComment: (id: string, text: string) => Promise<boolean>
   onOpenPhotos: (images: string[], index: number) => void
 }) {
   const p = proposal
   const [photoIdx, setPhotoIdx] = useState(0)
-  const [comment, setComment] = useState(p.client_comment || "")
-  const [dirty, setDirty] = useState(false)
+  const [comment, setComment] = useState("")
   const [saving, setSaving] = useState(false)
   const [status, setStatus] = useState<"" | "saved" | "error">("")
   const [showChecklist, setShowChecklist] = useState(false)
   const [showAllChips, setShowAllChips] = useState(false)
-
-  // Si llega un comentario nuevo del servidor y el cliente no está escribiendo, se actualiza
-  useEffect(() => {
-    if (!dirty) setComment(p.client_comment || "")
-  }, [p.client_comment, dirty])
 
   useEffect(() => {
     if (status !== "saved") return
@@ -75,8 +72,14 @@ export function ProposalCard({
   const toggleReaction = (r: Reaction) => save({ reaction: p.reaction === r ? null : r })
   const toggleFavorite = () => save({ favorite: !p.is_favorite })
   const sendComment = async () => {
-    const ok = await save({ comment: comment.trim() || null })
-    if (ok) setDirty(false)
+    const text = comment.trim()
+    if (!text) return
+    setSaving(true)
+    setStatus("")
+    const ok = await onComment(p.id, text)
+    setSaving(false)
+    setStatus(ok ? "saved" : "error")
+    if (ok) setComment("")
   }
 
   const images = p.images
@@ -85,7 +88,7 @@ export function ProposalCard({
   const hasChecklist = groupChecklist(p.checklist).length > 0
   const chips = showAllChips ? p.equipment : p.equipment.slice(0, MAX_CHIPS)
   const hiddenChips = p.equipment.length - MAX_CHIPS
-  const commentChanged = (comment.trim() || null) !== (p.client_comment || null)
+  const canSend = comment.trim().length > 0
 
   return (
     <article
@@ -260,19 +263,39 @@ export function ProposalCard({
           </div>
 
           <div className="space-y-2">
-            <label htmlFor={`comment-${p.id}`} className="text-xs font-semibold text-muted-foreground">
-              Tu comentario
+            <p className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+              <MessageSquareText className="h-3.5 w-3.5" />
+              {p.thread.length ? "Conversación con NorDrive" : "¿Alguna duda sobre este coche?"}
+            </p>
+            {p.thread.length > 0 && (
+              <div className="space-y-2 rounded-xl bg-muted/40 p-2.5 max-h-72 overflow-y-auto">
+                {p.thread.map((m, i) => (
+                  <div key={i} className={`flex ${m.from === "client" ? "justify-end" : "justify-start"}`}>
+                    <div
+                      className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm ${
+                        m.from === "client" ? "bg-primary text-primary-foreground" : "bg-background border border-border text-foreground"
+                      }`}
+                    >
+                      <p className={`text-[10px] font-semibold mb-0.5 ${m.from === "client" ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+                        {m.from === "client" ? "Tú" : "NorDrive"}
+                        {m.at ? ` · ${new Date(m.at).toLocaleString("es-ES", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}` : ""}
+                      </p>
+                      {m.text}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <label htmlFor={`comment-${p.id}`} className="sr-only">
+              Escribe a NorDrive
             </label>
             <textarea
               id={`comment-${p.id}`}
               value={comment}
-              onChange={(e) => {
-                setComment(e.target.value)
-                setDirty(true)
-              }}
+              onChange={(e) => setComment(e.target.value)}
               rows={2}
-              maxLength={2000}
-              placeholder="¿Qué te parece este coche? Cuéntanos cualquier duda."
+              maxLength={1000}
+              placeholder={p.thread.length ? "Escribe tu respuesta…" : "¿Qué te parece este coche? Cuéntanos cualquier duda."}
               className="w-full rounded-xl border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-y"
             />
             <div className="flex items-center justify-between gap-3">
@@ -294,11 +317,11 @@ export function ProposalCard({
               <Button
                 type="button"
                 size="sm"
-                disabled={saving || !commentChanged}
+                disabled={saving || !canSend}
                 onClick={sendComment}
                 className="bg-primary hover:bg-primary/95 text-primary-foreground rounded-xl"
               >
-                Enviar comentario
+                Enviar
               </Button>
             </div>
           </div>

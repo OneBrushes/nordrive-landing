@@ -53,6 +53,13 @@ export interface PortalCar extends CarSpecs {
   updated_at: string
 }
 
+/** Mensaje de la conversación sobre un coche propuesto */
+export interface ThreadMessage {
+  from: "client" | "nordrive"
+  text: string
+  at: string
+}
+
 export interface PortalProposal extends CarSpecs {
   id: string
   month: number | null
@@ -62,7 +69,25 @@ export interface PortalProposal extends CarSpecs {
   reaction: Reaction | null
   client_comment: string | null
   is_favorite: boolean
+  /** Conversación con NorDrive sobre este coche (la más antigua primero) */
+  thread: ThreadMessage[]
   created_at: string
+}
+
+function asThread(value: unknown, fallbackComment: string | null, fallbackAt: string): ThreadMessage[] {
+  const list = Array.isArray(value)
+    ? value
+        .filter((m): m is Record<string, unknown> => !!m && typeof m === "object")
+        .map((m) => ({
+          from: m.from === "nordrive" ? ("nordrive" as const) : ("client" as const),
+          text: typeof m.text === "string" ? m.text : "",
+          at: typeof m.at === "string" ? m.at : "",
+        }))
+        .filter((m) => m.text.trim())
+    : []
+  if (list.length) return list
+  // Antes de existir la conversación solo había un comentario suelto del cliente
+  return fallbackComment ? [{ from: "client", text: fallbackComment, at: fallbackAt }] : []
 }
 
 export interface PortalPhase {
@@ -164,6 +189,7 @@ export function normalizeProposal(row: Record<string, unknown>): PortalProposal 
     reaction: row.reaction === "like" || row.reaction === "dislike" ? row.reaction : null,
     client_comment: asTextOrNull(row.client_comment),
     is_favorite: row.is_favorite === true,
+    thread: asThread(row.thread, asTextOrNull(row.client_comment), asText(row.created_at)),
     created_at: asText(row.created_at),
   }
 }

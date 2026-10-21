@@ -114,7 +114,7 @@ export function PortalDashboard({
       setProposals(
         previous.map((p) =>
           p.id === id
-            ? { ...p, reaction: patch.reaction, client_comment: patch.comment, is_favorite: patch.favorite }
+            ? { ...p, reaction: patch.reaction, is_favorite: patch.favorite }
             : patch.favorite
               ? { ...p, is_favorite: false } // solo un favorito por cliente
               : p
@@ -124,7 +124,7 @@ export function PortalDashboard({
         const { error } = await supabase.rpc("portal_react_proposal", {
           proposal: id,
           new_reaction: patch.reaction,
-          new_comment: patch.comment,
+          new_comment: null, // los mensajes van por portal_comment_proposal
           favorite: patch.favorite,
         })
         if (error) {
@@ -138,6 +138,24 @@ export function PortalDashboard({
         return true
       } catch {
         setProposals(previous)
+        return false
+      }
+    },
+    [fetchProposals]
+  )
+
+  /** El cliente escribe a NorDrive sobre un coche propuesto */
+  const commentOnProposal = useCallback(
+    async (id: string, text: string): Promise<boolean> => {
+      try {
+        const { error } = await supabase.rpc("portal_comment_proposal", { proposal: id, body: text })
+        if (error) return false
+        const fresh = await fetchProposals()
+        if (!fresh.error && Array.isArray(fresh.data)) {
+          setProposals(sortProposals(fresh.data.map((row) => normalizeProposal(row as Record<string, unknown>))))
+        }
+        return true
+      } catch {
         return false
       }
     },
@@ -296,7 +314,8 @@ export function PortalDashboard({
                 <p className="text-sm text-muted-foreground">Coches que te proponemos. Dinos cuál te gusta más.</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                   {proposals.map((p) => (
-                    <ProposalCard key={p.id} proposal={p} onReact={reactToProposal} onOpenPhotos={openPhotos} />
+                    <ProposalCard key={p.id} proposal={p} onReact={reactToProposal}
+                    onComment={commentOnProposal} onOpenPhotos={openPhotos} />
                   ))}
                 </div>
               </div>
