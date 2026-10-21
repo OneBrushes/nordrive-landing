@@ -46,7 +46,8 @@ export interface PortalCar extends CarSpecs {
   delivered_on: string | null
   transport_mode: TransportMode
   note: string | null
-  /** Por dónde va cuando está en ruta (lo escribe NorDrive) */
+  /** A dónde va ("Camino a …") y por dónde va cuando está en ruta (lo escribe NorDrive) */
+  destination: string | null
   current_location: string | null
   location_updated_at: string | null
   /** Reseña del cliente (cuando ya está entregado) */
@@ -178,6 +179,7 @@ export function normalizeCar(row: Record<string, unknown>): PortalCar {
     delivered_on: asTextOrNull(row.delivered_on),
     transport_mode: row.transport_mode === "camion" ? "camion" : "conduciendo",
     note: asTextOrNull(row.note),
+    destination: asTextOrNull(row.destination),
     current_location: asTextOrNull(row.current_location),
     location_updated_at: asTextOrNull(row.location_updated_at),
     review_rating: asNumber(row.review_rating),
@@ -307,7 +309,7 @@ export function statusHeadline(car: PortalCar): string {
     case "purchased":
       return "Comprado · Preparando la recogida"
     case "in_transit":
-      return `De camino a España · ${TRANSPORT_LABELS[car.transport_mode]}`
+      return `${car.destination ? `Camino a ${car.destination}` : "De camino a España"} · ${TRANSPORT_LABELS[car.transport_mode]}`
     case "homologation":
       return "Homologación y matrícula"
     case "detailing":

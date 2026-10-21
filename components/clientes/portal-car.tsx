@@ -109,7 +109,7 @@ export function CarView({
   const hasChecklist = groupChecklist(car.checklist).length > 0;
   const specs = specLine(car);
   const hasSideColumn = Boolean(car.note) || car.documents.length > 0;
-  const showLocation = car.stage === "in_transit" && Boolean(car.current_location);
+  const showLocation = car.stage === "in_transit" && Boolean(car.current_location || car.destination);
 
   return (
     <div className="space-y-6">
@@ -214,7 +214,8 @@ export function CarView({
             {showLocation && (
               <p className="mt-3 inline-flex flex-wrap items-center gap-1.5 rounded-xl bg-background border border-border px-3 py-2 text-sm">
                 <MapPin className="h-4 w-4 text-red-500 flex-shrink-0" />
-                <span className="font-semibold text-foreground">Ahora en: {car.current_location}</span>
+                {car.destination && <span className="text-foreground">Camino a <b>{car.destination}</b>{car.current_location ? " ·" : ""}</span>}
+                {car.current_location && <span className="font-semibold text-foreground">Ahora en: {car.current_location}</span>}
                 {timeAgo(car.location_updated_at) && (
                   <span className="text-xs text-muted-foreground">· {timeAgo(car.location_updated_at)}</span>
                 )}
@@ -278,7 +279,8 @@ export function CarView({
                   <p className="text-xs text-muted-foreground">{phase.desc}</p>
                   {phase.key === "transit" && phase.status === "current" && showLocation && (
                     <p className="text-xs font-semibold text-foreground flex items-center gap-1">
-                      <MapPin className="h-3.5 w-3.5 text-red-500" /> {car.current_location}
+                      <MapPin className="h-3.5 w-3.5 text-red-500" />
+                      {car.destination ? `Camino a ${car.destination}` : ""}{car.destination && car.current_location ? " · ahora en " : ""}{car.current_location ?? ""}
                       {timeAgo(car.location_updated_at) && <span className="font-normal text-muted-foreground">· {timeAgo(car.location_updated_at)}</span>}
                     </p>
                   )}
