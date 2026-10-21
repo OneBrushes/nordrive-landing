@@ -124,7 +124,8 @@ export function PortalDashboard({
         const { error } = await supabase.rpc("portal_react_proposal", {
           proposal: id,
           new_reaction: patch.reaction,
-          new_comment: null, // los mensajes van por portal_comment_proposal
+          // se reenvía el último comentario para no borrarlo (los mensajes nuevos van por portal_comment_proposal)
+          new_comment: patch.comment,
           favorite: patch.favorite,
         })
         if (error) {
