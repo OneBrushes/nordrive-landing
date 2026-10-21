@@ -9,6 +9,55 @@ export const SITE_URL = "https://www.nordrivecars.com"
 export const SITE_NAME = "NorDrive"
 export const SITE_LOGO = `${SITE_URL}/Logo.png`
 
+// ---------- categorías ----------
+
+export type BlogCategory = "importacion" | "noticias"
+
+export const BLOG_CATEGORIES: {
+  slug: BlogCategory
+  /** Etiqueta corta (chip, migas de pan, articleSection) */
+  label: string
+  /** Título de la sección en el índice del blog */
+  sectionTitle: string
+  /** H1 de la página de la categoría */
+  pageTitle: string
+  description: string
+}[] = [
+  {
+    slug: "noticias",
+    label: "Noticias del motor",
+    sectionTitle: "Últimas noticias",
+    pageTitle: "Noticias del motor",
+    description:
+      "Lanzamientos, precios, normativa y todo lo que se mueve en el mundo del motor en Europa, contado de forma clara.",
+  },
+  {
+    slug: "importacion",
+    label: "Importación",
+    sectionTitle: "Guías de importación",
+    pageTitle: "Guías de importación",
+    description:
+      "Cómo importar un coche de Alemania a España: costes reales, impuestos, trámites, inspecciones y los modelos que más salen a cuenta.",
+  },
+]
+
+export function categoryInfo(category: BlogCategory) {
+  return BLOG_CATEGORIES.find((c) => c.slug === category) ?? BLOG_CATEGORIES[1]
+}
+
+export function categoryLabel(category: BlogCategory) {
+  return categoryInfo(category).label
+}
+
+/** Las filas antiguas (sin categoría o con un valor desconocido) cuentan como importación */
+export function normalizeCategory(value: string | null | undefined): BlogCategory {
+  return value === "noticias" ? "noticias" : "importacion"
+}
+
+export function categoryUrl(category: BlogCategory) {
+  return `${SITE_URL}/blog/categoria/${category}/`
+}
+
 export type BlogArticle = {
   slug: string
   title: string
@@ -19,6 +68,9 @@ export type BlogArticle = {
   /** URL absoluta (https://…) o ruta local de /public ("/foto.jpg"), o null */
   cover: string | null
   coverAlt: string
+  /** Crédito de la foto de portada, p. ej. "Foto: Jane Doe / Flickr · CC BY 2.0" */
+  coverCredit: string | null
+  category: BlogCategory
   tags: string[]
   author: string
   seoTitle: string | null
@@ -38,6 +90,8 @@ type BlogPostRow = {
   content: string | null
   cover_url: string | null
   cover_alt: string | null
+  cover_credit?: string | null
+  category?: string | null
   tags: string[] | null
   author: string | null
   seo_title: string | null
@@ -153,6 +207,8 @@ function fromRow(row: BlogPostRow): BlogArticle {
     format: "markdown",
     cover: row.cover_url || null,
     coverAlt: row.cover_alt || row.title,
+    coverCredit: row.cover_credit?.trim() || null,
+    category: normalizeCategory(row.category),
     tags: (row.tags ?? []).filter(Boolean),
     author: row.author || SITE_NAME,
     seoTitle: row.seo_title || null,
@@ -176,6 +232,8 @@ function fromLegacy(): BlogArticle[] {
         format: "html" as const,
         cover: p.cover || null,
         coverAlt: p.title,
+        coverCredit: null,
+        category: "importacion" as const,
         tags: p.tags,
         author: SITE_NAME,
         seoTitle: null,
@@ -220,6 +278,7 @@ let cached: Promise<BlogArticle[]> | null = null
 
 async function load(): Promise<BlogArticle[]> {
   if (process.env.BLOG_SAMPLE === "1") return [...samplePosts()].sort(byDateDesc)
+  if (process.env.BLOG_SAMPLE === "empty") return [] // para revisar el blog sin ningún artículo
 
   const remote = await fetchFromSupabase()
   const legacy = fromLegacy()
@@ -240,12 +299,22 @@ export async function getArticle(slug: string) {
   return (await getAllArticles()).find((p) => p.slug === slug) ?? null
 }
 
-/** Hasta `limit` artículos que comparten etiquetas; si no hay suficientes, los más recientes */
+export async function getArticlesByCategory(category: BlogCategory) {
+  return (await getAllArticles()).filter((p) => p.category === category)
+}
+
+/**
+ * Hasta `limit` artículos relacionados: primero los de la misma categoría (ordenados por etiquetas
+ * en común y luego por fecha), después los que comparten etiquetas y, si faltan, los más recientes.
+ */
 export function relatedArticles(all: BlogArticle[], current: BlogArticle, limit = 3) {
   const tags = new Set(current.tags.map((t) => t.toLowerCase()))
   const others = all.filter((p) => p.slug !== current.slug)
   const scored = others
-    .map((p) => ({ p, score: p.tags.filter((t) => tags.has(t.toLowerCase())).length }))
+    .map((p) => ({
+      p,
+      score: (p.category === current.category ? 10 : 0) + p.tags.filter((t) => tags.has(t.toLowerCase())).length,
+    }))
     .filter((x) => x.score > 0)
     .sort((a, b) => b.score - a.score || byDateDesc(a.p, b.p))
     .map((x) => x.p)
@@ -257,12 +326,16 @@ export function relatedArticles(all: BlogArticle[], current: BlogArticle, limit 
   return picked
 }
 
-/** Slugs para generateStaticParams: nunca vacío (la exportación estática necesita al menos uno) */
+/**
+ * Slug de relleno: la exportación estática necesita al menos una página en /blog/[slug]/. Si no hay
+ * ningún artículo publicado se genera solo esta página ("próximamente", con noindex y fuera del sitemap).
+ */
+export const PLACEHOLDER_SLUG = "proximamente"
+
+/** Slugs para generateStaticParams: nunca vacío */
 export async function getArticleSlugs() {
-  const all = await getAllArticles()
-  const list = all.length > 0 ? all : fromLegacy()
-  const slugs = list.map((p) => p.slug)
-  return slugs.length > 0 ? slugs : legacyPosts.map((p) => p.slug)
+  const slugs = (await getAllArticles()).map((p) => p.slug)
+  return slugs.length > 0 ? slugs : [PLACEHOLDER_SLUG]
 }
 
 // ---------- datos de ejemplo (solo para revisar en local con BLOG_SAMPLE=1) ----------
@@ -276,9 +349,13 @@ function samplePosts(): BlogArticle[] {
   }
   const a1 = `Importar un coche de Alemania sigue siendo una de las mejores formas de conseguir un premium bien equipado a buen precio. Pero el precio del anuncio **no es el precio final**: hay impuestos, transporte y trámites que conviene tener claros desde el principio.
 
+En esta guía repasamos, partida a partida, todo lo que pagas desde que eliges el coche en un portal alemán hasta que lo aparcas en tu garaje con matrícula española.
+
 ## El precio del coche en Alemania
 
 En portales como mobile.de o AutoScout24 los precios suelen ser entre un 10 % y un 20 % más bajos que en España para el mismo modelo, sobre todo en berlinas y SUV de BMW, Mercedes-Benz y Audi.
+
+![Berlinas y SUV alemanes en un concesionario](/luxury-german-cars-bmw-mercedes-audi-showroom.jpg "Foto: NorDrive · Todos los derechos reservados")
 
 - Fíjate si el precio incluye IVA (*MwSt. ausweisbar*): si eres empresa o autónomo puedes recuperarlo.
 - Pide siempre el historial de mantenimiento (*Scheckheft*).
@@ -297,6 +374,10 @@ El gran coste "oculto" es el **Impuesto Especial sobre Determinados Medios de Tr
 
 Además, hay que pagar el Impuesto de Transmisiones Patrimoniales (ITP) si el coche es de segunda mano y lo compras a un particular.
 
+### ¿Y si el coche es eléctrico?
+
+Los eléctricos puros tributan al 0 % de IEDMT, así que el ahorro suele ser todavía mayor.
+
 ## Transporte y trámites
 
 El transporte en camión portacoches desde Alemania cuesta normalmente entre **700 € y 1.200 €**, según la ciudad de origen. A eso hay que sumar:
@@ -305,17 +386,25 @@ El transporte en camión portacoches desde Alemania cuesta normalmente entre **7
 2. ITV de importación.
 3. Tasas de la DGT y placas.
 
+![Cliente recogiendo su BMW importado](/client-with-bmw.jpg "Foto: NorDrive · Entrega a un cliente en Madrid")
+
 ## ¿Cuánto me ahorro de verdad?
 
 En un coche de 40.000 € el ahorro neto, una vez pagado todo, suele estar entre **3.000 € y 6.000 €**. Puedes consultar las tablas oficiales en la [web de la Agencia Tributaria](https://sede.agenciatributaria.gob.es/).
 
-> Consejo NorDrive: calcula siempre el coste total antes de dar una señal. Nosotros te lo damos cerrado desde el primer día.
+> Calcula siempre el coste total antes de dar una señal: el precio del anuncio es solo el principio.
+
+Si quieres, te preparamos el cálculo cerrado de tu coche sin compromiso.
 `
   const a2 = `Comprar un coche a 2.000 km de distancia da respeto. La clave está en **verificar antes de pagar** y en hacerlo con un método.
+
+Estos son los pasos que seguimos en cada compra para que no haya sorpresas al recibir el coche.
 
 ## Revisa el historial y los papeles
 
 Pide el *Fahrzeugbrief* (Zulassungsbescheinigung Teil II) y comprueba que el número de bastidor coincide con el del coche.
+
+![Mercedes revisado antes de la compra](/client-with-mercedes.jpg "Foto: NorDrive")
 
 ## Inspección independiente
 
@@ -329,27 +418,70 @@ Una inspección por un taller o perito independiente cuesta poco comparado con e
 
 Nunca pagues por adelantado a desconocidos. Usa transferencia a cuenta de empresa verificada o un servicio de custodia.
 
+![Audi entregado a su nuevo propietario](/client-with-audi.jpg)
+
 ## Entrega en España
 
 Cuando el coche llega, revisa que el estado coincide con las fotos de la inspección antes de firmar el albarán de entrega.
 `
-  const a3 = `El mercado de eléctricos de segunda mano en Alemania es enorme y los precios han bajado mucho. Estos son los modelos que más nos piden.
+  const n1 = `Volkswagen ha confirmado los precios para Alemania del nuevo ID. Polo, el eléctrico compacto con el que quiere volver a llenar las calles de utilitarios asequibles.
 
-## Los más buscados
+La versión de acceso arranca por debajo de los 25.000 euros antes de ayudas, una cifra que lo coloca en la pelea directa con los eléctricos urbanos de origen chino.
 
-- **Tesla Model 3**: autonomía y red de carga.
-- **BMW i4**: el equilibrio entre deportivo y eficiente.
-- **Volkswagen ID.4**: espacio familiar a buen precio.
+## Qué ofrece
 
-## Qué mirar en la batería
+El ID. Polo estrena la plataforma MEB+ de tracción delantera, con baterías de dos tamaños y una autonomía homologada que supera los 400 km en la versión mayor.
 
-Pide el informe de estado de salud de la batería (SoH). Por encima del 90 % es un buen dato.
+![Volkswagen en la entrega a un cliente](/client-with-vw.jpg "Foto: NorDrive · Imagen ilustrativa")
 
-## Ventaja fiscal
+## Cuándo llega a España
 
-Los eléctricos tributan al **0 %** de IEDMT, así que el ahorro frente a comprar en España suele ser mayor.
+Las primeras unidades llegarán a los concesionarios españoles en primavera. Hasta entonces, el mercado de segunda mano alemán seguirá siendo la forma más rápida de conseguir un eléctrico compacto.
+
+![Concesionario con coches alemanes](/luxury-german-cars-bmw-mercedes-audi-showroom.jpg "Foto: NorDrive")
+
+## Lo que significa para el comprador
+
+Más competencia en el segmento suele traducirse en descuentos en los modelos que ya están en el mercado, sobre todo en las unidades de kilómetro cero.
+`
+  // noticias cortas para ver la rejilla con muchas tarjetas (y el anuncio tras la 6ª)
+  const briefs: { title: string; excerpt: string; cover: string | null }[] = [
+    { title: "La UE aprueba la norma Euro 7: qué cambia para los coches nuevos", excerpt: "Frenos, neumáticos y baterías entran por primera vez en la normativa de emisiones.", cover: "/client-with-mercedes.jpg" },
+    { title: "BMW presenta el nuevo iX3 de la Neue Klasse", excerpt: "Hasta 800 km de autonomía y carga a 400 kW: así es el primer modelo de la nueva era de BMW.", cover: null },
+    { title: "Los precios de los coches usados bajan en Alemania por tercer mes", excerpt: "El mercado de ocasión alemán encadena tres meses de descensos, sobre todo en diésel.", cover: "/client-with-audi.jpg" },
+    { title: "La DGT revisa la etiqueta ambiental de los híbridos ligeros", excerpt: "Qué coches podrían perder la etiqueta ECO y desde cuándo se aplicaría el cambio.", cover: "/client-with-vw.jpg" },
+    { title: "Audi confirma que el cinco cilindros seguirá en el RS 3", excerpt: "El mítico motor de cinco cilindros aguantará al menos hasta el final de la década.", cover: "/client-with-bmw.jpg" },
+    { title: "Mercedes rebaja el precio del CLA eléctrico en Alemania", excerpt: "La berlina eléctrica baja de precio para competir con el Tesla Model 3.", cover: null },
+    { title: "Toyota prepara un deportivo eléctrico con cambio manual simulado", excerpt: "La marca japonesa insiste en que conducir un eléctrico también puede ser divertido.", cover: "/client-with-mercedes.jpg" },
+    { title: "Alemania estudia un nuevo plan de ayudas para el coche eléctrico", excerpt: "El Gobierno alemán vuelve a plantear incentivos para las rentas medias.", cover: null },
+    { title: "Porsche retrasa el Cayenne eléctrico hasta 2027", excerpt: "La marca de Stuttgart ajusta su calendario de lanzamientos eléctricos.", cover: "/client-with-audi.jpg" },
+    { title: "Ventas de eléctricos en Europa: nuevo récord en septiembre", excerpt: "Los eléctricos superan por primera vez el 20 % de cuota en la Unión Europea.", cover: "/luxury-german-cars-bmw-mercedes-audi-showroom.jpg" },
+  ]
+  const briefBody = `Resumen de la noticia en dos párrafos para revisar el diseño de las tarjetas y de la página de la categoría.
+
+Las noticias cortas también deben verse bien: con portada, sin portada y con muy poco texto.
+
+## Contexto
+
+Un poco más de contexto para que el artículo tenga al menos un apartado.
 `
   return [
+    {
+      ...base,
+      slug: "volkswagen-id-polo-precio-alemania",
+      title: "El Volkswagen ID. Polo ya tiene precio en Alemania: menos de 25.000 euros",
+      excerpt:
+        "El eléctrico compacto de Volkswagen llega para plantar cara a los urbanos chinos. Esto es lo que sabemos de su precio y de su llegada a España.",
+      content: n1,
+      cover: "/client-with-vw.jpg",
+      coverAlt: "Volkswagen aparcado delante de un edificio",
+      coverCredit: "Foto: NorDrive · Imagen ilustrativa",
+      category: "noticias" as const,
+      tags: ["Volkswagen", "eléctricos", "precios"],
+      publishedAt: "2026-10-19T08:00:00.000Z",
+      updatedAt: "2026-10-19T08:00:00.000Z",
+      readingMinutes: estimateReadingMinutes(n1, "markdown"),
+    },
     {
       ...base,
       slug: "cuanto-cuesta-importar-un-coche-de-alemania-2026",
@@ -358,6 +490,8 @@ Los eléctricos tributan al **0 %** de IEDMT, así que el ahorro frente a compra
       content: a1,
       cover: "/luxury-german-cars-bmw-mercedes-audi-showroom.jpg",
       coverAlt: "BMW, Mercedes y Audi en un concesionario alemán",
+      coverCredit: "Foto: Jane Doe / Flickr · CC BY 2.0",
+      category: "importacion" as const,
       tags: ["importación", "impuestos", "Alemania"],
       publishedAt: "2026-10-15T08:00:00.000Z",
       updatedAt: "2026-10-18T08:00:00.000Z",
@@ -371,6 +505,8 @@ Los eléctricos tributan al **0 %** de IEDMT, así que el ahorro frente a compra
       content: a2,
       cover: "/client-with-bmw.jpg",
       coverAlt: "Cliente de NorDrive recogiendo su BMW",
+      coverCredit: "Foto: NorDrive",
+      category: "importacion" as const,
       tags: ["importación", "consejos"],
       publishedAt: "2026-10-01T08:00:00.000Z",
       updatedAt: "2026-10-01T08:00:00.000Z",
@@ -381,13 +517,33 @@ Los eléctricos tributan al **0 %** de IEDMT, así que el ahorro frente a compra
       slug: "mejores-coches-electricos-para-importar",
       title: "Los mejores coches eléctricos para importar de Alemania",
       excerpt: "Tesla, BMW i4 o ID.4: qué eléctricos salen más a cuenta y qué revisar en la batería.",
-      content: a3,
+      content: a1,
       cover: null,
       coverAlt: "",
+      coverCredit: null,
+      category: "importacion" as const,
       tags: ["eléctricos", "Alemania"],
       publishedAt: "2026-09-20T08:00:00.000Z",
       updatedAt: "2026-09-20T08:00:00.000Z",
-      readingMinutes: estimateReadingMinutes(a3, "markdown"),
+      readingMinutes: estimateReadingMinutes(a1, "markdown"),
     },
+    ...briefs.map((b, i) => {
+      const date = new Date(Date.UTC(2026, 9, 17 - i * 2, 8)).toISOString()
+      return {
+        ...base,
+        slug: `noticia-de-ejemplo-${i + 1}`,
+        title: b.title,
+        excerpt: b.excerpt,
+        content: briefBody,
+        cover: b.cover,
+        coverAlt: b.cover ? "Coche alemán (imagen de ejemplo)" : "",
+        coverCredit: b.cover ? "Foto: NorDrive" : null,
+        category: "noticias" as const,
+        tags: ["actualidad"],
+        publishedAt: date,
+        updatedAt: date,
+        readingMinutes: estimateReadingMinutes(briefBody, "markdown"),
+      }
+    }),
   ]
 }

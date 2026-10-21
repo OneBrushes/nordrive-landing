@@ -22,6 +22,8 @@ export const posts: Post[] = [
     date: "2024-12-15",
     tags: ["importación", "ahorro", "premium"],
     cover: "/luxury-german-cars-bmw-mercedes-audi-showroom.jpg",
+    // artículo de prueba: no debe publicarse en la web
+    draft: true,
   },
 ]
 
