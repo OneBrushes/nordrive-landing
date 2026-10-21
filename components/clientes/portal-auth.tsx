@@ -73,7 +73,7 @@ export function PortalLogin({ initialError = "" }: { initialError?: string }) {
         const msg = (error.message || "").toLowerCase()
         if (isRateLimit(error)) setError("Demasiados intentos. Espera unos minutos y vuelve a probar.")
         else if (msg.includes("not confirmed")) setError("Aún no has confirmado tu correo. Usa el enlace de abajo para recibir uno nuevo.")
-        else setError("Correo o contraseña incorrectos. Si es tu primera vez, usa el enlace de abajo.")
+        else setError("Correo o contraseña incorrectos. Si es tu primera vez, entra con el enlace de la invitación que te enviamos por correo.")
       }
     } catch {
       setError("No hemos podido conectar. Revisa tu conexión e inténtalo de nuevo.")
@@ -101,15 +101,17 @@ export function PortalLogin({ initialError = "" }: { initialError?: string }) {
         email: cleanEmail,
         options: {
           emailRedirectTo: window.location.origin + withBasePath("/clientes/"),
-          shouldCreateUser: true,
-          data: { portal: "clientes" },
+          // Las cuentas solo se crean con la invitación que manda NorDrive desde su app
+          shouldCreateUser: false,
         },
       })
       if (error) {
         setError(
           isRateLimit(error)
             ? "Ya te hemos enviado un enlace hace poco. Espera unos minutos antes de pedir otro."
-            : "No hemos podido enviarte el enlace. Inténtalo de nuevo en unos minutos."
+            : /signup|not allowed|not found|user/i.test(error.message || "")
+              ? "Todavía no tienes cuenta. NorDrive te enviará una invitación por correo para crearla; si no la encuentras, mira en spam o escríbenos."
+              : "No hemos podido enviarte el enlace. Inténtalo de nuevo en unos minutos."
         )
         return
       }
@@ -202,15 +204,15 @@ export function PortalLogin({ initialError = "" }: { initialError?: string }) {
               onClick={() => switchMode("link")}
               className="text-xs text-primary font-medium hover:underline"
             >
-              ¿Primera vez o has olvidado tu contraseña?
+              ¿Has olvidado tu contraseña?
             </button>
           </div>
         </>
       ) : (
         <>
           <CardHeader
-            title="Acceso por correo"
-            subtitle="Escribe el correo que nos diste y te enviaremos un enlace para entrar y elegir tu contraseña."
+            title="Recuperar contraseña"
+            subtitle="Escribe tu correo y te enviaremos un enlace para entrar y elegir una contraseña nueva. ¿Es tu primera vez? Entra con el enlace de la invitación que te enviamos."
           />
           <form onSubmit={handleSendLink} className="space-y-5">
             <div className="space-y-2">

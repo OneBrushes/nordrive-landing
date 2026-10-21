@@ -297,7 +297,7 @@ export function PortalDashboard({
                     ))}
                   </div>
                 )}
-                <CarView key={car.id} car={car} onOpenPhotos={openPhotos} />
+                <CarView key={car.id} car={car} onOpenPhotos={openPhotos} onChanged={load} />
               </div>
             ) : (
               <div className="flex justify-center">

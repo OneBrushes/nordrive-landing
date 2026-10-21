@@ -46,6 +46,13 @@ export interface PortalCar extends CarSpecs {
   delivered_on: string | null
   transport_mode: TransportMode
   note: string | null
+  /** Por dónde va cuando está en ruta (lo escribe NorDrive) */
+  current_location: string | null
+  location_updated_at: string | null
+  /** Reseña del cliente (cuando ya está entregado) */
+  review_rating: number | null
+  review_liked: string | null
+  review_improve: string | null
   checklist_updated_at: string | null
   /** Fotos extra en el bucket privado (hay que firmarlas) */
   photos: PortalFile[]
@@ -171,6 +178,11 @@ export function normalizeCar(row: Record<string, unknown>): PortalCar {
     delivered_on: asTextOrNull(row.delivered_on),
     transport_mode: row.transport_mode === "camion" ? "camion" : "conduciendo",
     note: asTextOrNull(row.note),
+    current_location: asTextOrNull(row.current_location),
+    location_updated_at: asTextOrNull(row.location_updated_at),
+    review_rating: asNumber(row.review_rating),
+    review_liked: asTextOrNull(row.review_liked),
+    review_improve: asTextOrNull(row.review_improve),
     checklist_updated_at: asTextOrNull(row.checklist_updated_at),
     photos: asFiles(row.photos),
     documents: asFiles(row.documents),
@@ -446,4 +458,18 @@ export function isNotReadyError(error: unknown): boolean {
     msg.includes("does not exist") ||
     msg.includes("could not find")
   )
+}
+
+/** "hace 2 h", "hace 3 días"… para la última ubicación */
+export function timeAgo(iso: string | null): string {
+  if (!iso) return ""
+  const ms = Date.now() - new Date(iso).getTime()
+  if (!Number.isFinite(ms) || ms < 0) return ""
+  const min = Math.round(ms / 60000)
+  if (min < 1) return "ahora mismo"
+  if (min < 60) return `hace ${min} min`
+  const h = Math.round(min / 60)
+  if (h < 24) return `hace ${h} h`
+  const d = Math.round(h / 24)
+  return d === 1 ? "hace 1 día" : `hace ${d} días`
 }
