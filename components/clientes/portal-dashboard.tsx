@@ -177,8 +177,9 @@ export function PortalDashboard({
         setDocError("No hemos podido abrir el documento. Inténtalo de nuevo.")
         return
       }
-      const w = window.open(data.signedUrl, "_blank")
-      if (!w) window.location.href = data.signedUrl
+      // El enlace firmado lleva "download": el navegador descarga el archivo sin salir de la página
+      // (una ventana nueva después de un await la bloquean los bloqueadores de popups)
+      window.location.href = data.signedUrl
     } catch {
       setDocError("No hemos podido abrir el documento. Inténtalo de nuevo.")
     } finally {
