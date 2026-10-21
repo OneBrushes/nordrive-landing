@@ -4,6 +4,9 @@ on:
   push:
     branches: [ master ]
   workflow_dispatch:
+  # reconstrucción diaria para que los artículos programados del blog se publiquen solos
+  schedule:
+    - cron: "0 5 * * *"
 
 permissions:
   contents: read

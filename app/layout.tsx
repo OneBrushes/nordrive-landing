@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next'
 import Script from 'next/script'
 import './globals.css'
 import { TallyModalProvider } from "@/contexts/tally-modal-context"
+import { PageViewTracker } from "@/components/page-view-tracker"
 
 const poppins = Poppins({ 
   subsets: ['latin'], 
@@ -14,6 +15,7 @@ const poppins = Poppins({
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || ''
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.nordrivecars.com'),
   title: 'Nordrive',
   icons: {
     icon: `${basePath}/favicon.ico`,
@@ -27,11 +29,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body className={`${poppins.variable} font-sans antialiased`}>
         <TallyModalProvider>
           {children}
         </TallyModalProvider>
+        <PageViewTracker />
         <Analytics />
         <Script id="microsoft-clarity" strategy="afterInteractive">
           {`
