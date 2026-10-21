@@ -49,6 +49,8 @@ export interface PortalCar extends CarSpecs {
   /** A dónde va ("Camino a …") y por dónde va cuando está en ruta (lo escribe NorDrive) */
   destination: string | null
   current_location: string | null
+  /** Enlace de Google Maps / Apple Maps de dónde está ahora */
+  location_url: string | null
   location_updated_at: string | null
   /** Reseña del cliente (cuando ya está entregado) */
   review_rating: number | null
@@ -181,6 +183,7 @@ export function normalizeCar(row: Record<string, unknown>): PortalCar {
     note: asTextOrNull(row.note),
     destination: asTextOrNull(row.destination),
     current_location: asTextOrNull(row.current_location),
+    location_url: safeMapUrl(row.location_url),
     location_updated_at: asTextOrNull(row.location_updated_at),
     review_rating: asNumber(row.review_rating),
     review_liked: asTextOrNull(row.review_liked),
@@ -474,4 +477,12 @@ export function timeAgo(iso: string | null): string {
   if (h < 24) return `hace ${h} h`
   const d = Math.round(h / 24)
   return d === 1 ? "hace 1 día" : `hace ${d} días`
+}
+
+/** Solo enlaces https de Google Maps / Apple Maps (lo demás se ignora) */
+export function safeMapUrl(value: unknown): string | null {
+  if (typeof value !== "string") return null
+  return /^https:\/\/((www\.)?google\.[a-z.]+\/maps|maps\.google\.[a-z.]+|maps\.app\.goo\.gl|goo\.gl\/maps|maps\.apple\.com)(\/|\?|$)/i.test(value.trim())
+    ? value.trim()
+    : null
 }

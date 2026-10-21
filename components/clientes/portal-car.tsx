@@ -109,7 +109,7 @@ export function CarView({
   const hasChecklist = groupChecklist(car.checklist).length > 0;
   const specs = specLine(car);
   const hasSideColumn = Boolean(car.note) || car.documents.length > 0;
-  const showLocation = car.stage === "in_transit" && Boolean(car.current_location || car.destination);
+  const showLocation = car.stage === "in_transit" && Boolean(car.current_location || car.destination || car.location_url);
 
   return (
     <div className="space-y-6">
@@ -216,6 +216,16 @@ export function CarView({
                 <MapPin className="h-4 w-4 text-red-500 flex-shrink-0" />
                 {car.destination && <span className="text-foreground">Camino a <b>{car.destination}</b>{car.current_location ? " ·" : ""}</span>}
                 {car.current_location && <span className="font-semibold text-foreground">Ahora en: {car.current_location}</span>}
+                {car.location_url && (
+                  <a
+                    href={car.location_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 rounded-lg bg-primary px-2.5 py-1 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+                  >
+                    <MapPin className="h-3.5 w-3.5" /> Ver en el mapa
+                  </a>
+                )}
                 {timeAgo(car.location_updated_at) && (
                   <span className="text-xs text-muted-foreground">· {timeAgo(car.location_updated_at)}</span>
                 )}
@@ -281,6 +291,11 @@ export function CarView({
                     <p className="text-xs font-semibold text-foreground flex items-center gap-1">
                       <MapPin className="h-3.5 w-3.5 text-red-500" />
                       {car.destination ? `Camino a ${car.destination}` : ""}{car.destination && car.current_location ? " · ahora en " : ""}{car.current_location ?? ""}
+                      {car.location_url && (
+                        <a href={car.location_url} target="_blank" rel="noopener noreferrer" className="ml-1 font-semibold text-primary underline-offset-2 hover:underline">
+                          Ver en el mapa
+                        </a>
+                      )}
                       {timeAgo(car.location_updated_at) && <span className="font-normal text-muted-foreground">· {timeAgo(car.location_updated_at)}</span>}
                     </p>
                   )}
